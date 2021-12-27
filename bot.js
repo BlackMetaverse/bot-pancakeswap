@@ -26,7 +26,9 @@ const data = {
 
   gasLimit : process.env.GAS_LIMIT, //at least 21000
 
-  minBnb : process.env.MIN_LIQUIDITY_ADDED //min liquidity added
+  minBnb : process.env.MIN_LIQUIDITY_ADDED, //min liquidity added
+
+  minBuy : process.env.MIN_BUY // 代币购买最小值
 }
 
 let initialLiquidityDetected = false;
@@ -35,6 +37,7 @@ let jmlBnb = 0;
 const wss = process.env.WSS_NODE;
 const mnemonic = process.env.YOUR_MNEMONIC //your memonic;
 const tokenIn = data.WBNB;
+const minBuy = data.minBuy;
 const tokenOut = data.to_PURCHASE;
 // const provider = new ethers.providers.JsonRpcProvider(bscMainnetUrl)
 const provider = new ethers.providers.WebSocketProvider(wss);
@@ -105,7 +108,7 @@ const run = async () => {
     try{
       initialLiquidityDetected = true;
 
-      let amountOutMin = 0;
+      let amountOutMin = ethers.utils.parseUnits(`${data.minBuy}`, 'ether');
       //We buy x amount of the new token for our wbnb
       const amountIn = ethers.utils.parseUnits(`${data.AMOUNT_OF_WBNB}`, 'ether');
       if ( parseInt(data.Slippage) !== 0 ){
@@ -125,7 +128,7 @@ const run = async () => {
 
       console.log('Processing Transaction.....');
       console.log(chalk.yellow(`amountIn: ${(amountIn * 1e-18)} ${tokenIn} (BNB)`));
-      console.log(chalk.yellow(`amountOutMin: ${amountOutMin}`));
+      console.log(chalk.yellow(`amountOutMin: ${amountOutMin * 1e-18}`));
       console.log(chalk.yellow(`tokenIn: ${tokenIn}`));
       console.log(chalk.yellow(`tokenOut: ${tokenOut}`));
       console.log(chalk.yellow(`data.recipient: ${data.recipient}`));
